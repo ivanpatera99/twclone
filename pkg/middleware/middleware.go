@@ -16,10 +16,15 @@ func Middleware(next http.Handler) http.Handler {
 		
 		user, err := auth.GetUser(userId, username)
 		if err != nil {
+			if err.Error() == "INVALID_USER" {
+				http.Error(w, "INVALID_USER", http.StatusForbidden)
+				return
+			}
 			http.Error(w, "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 			return
 		}
 
+		// Enrich the request context with the user data
 		ctx := context.WithValue(r.Context(), auth.UserIDKey, user.ID)
 		ctx = context.WithValue(ctx, auth.UsernameKey, user.Username)
 
