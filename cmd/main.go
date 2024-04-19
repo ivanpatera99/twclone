@@ -1,7 +1,9 @@
 package main
 
-import "fmt"
+import (
+	"github.com/ivanpatera/twclone/internal/app/http"
+)
 
 func main() {
-	fmt.Println("Hello, World!")
+	app.App()
 }
