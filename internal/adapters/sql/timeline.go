@@ -8,14 +8,16 @@ import (
 
 type TimelineSqlAdapter struct{}
 
-func (a TimelineSqlAdapter) GetTimelineFollowing(userId string) (entities.Timeline, error) {
+func (a TimelineSqlAdapter) GetTimelineFollowing(userId string, limit, offset int) (entities.Timeline, error) {
 	qry := `
 		SELECT t.id, t.text, t.ts, u.id, u.username
 		FROM tweets t
 		JOIN followings f ON f.follower_id = ? AND f.followee_id = t.user_id
 		JOIN users u ON t.user_id = u.id
+		ORDER BY t.ts DESC
+		LIMIT ? OFFSET ?
 	`
-	rows, err := sql.QueryRows(qry, userId)
+	rows, err := sql.QueryRows(qry, userId, limit, offset)
 	if err != nil {
 		return entities.Timeline{}, err
 	}

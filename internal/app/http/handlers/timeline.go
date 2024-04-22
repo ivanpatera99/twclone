@@ -3,6 +3,7 @@ package handlers
 import (
 	"encoding/json"
 	"net/http"
+	"strconv"
 
 	"github.com/ivanpatera/twclone/internal/domain/usecases"
 	"github.com/ivanpatera/twclone/pkg/auth"
@@ -14,6 +15,7 @@ type TimelineHandler struct {
 
 type GetTimelineFollowingResponse struct {
 	Timeline []TimelineTweetResponse `json:"timeline"`
+	Pagination PaginationResponse     `json:"pagination"`
 }
 
 type TimelineTweetResponse struct {
@@ -24,15 +26,38 @@ type TimelineTweetResponse struct {
 	Ts       int64  `json:"ts"`
 }
 
+type PaginationResponse struct {
+	Limit int `json:"limit"`
+	Offset int `json:"offset"`
+}
+
 func (handler TimelineHandler) GetTimelineFollowingHandler(w http.ResponseWriter, r *http.Request) {
 	userId := r.Context().Value(auth.UserIDKey).(string)
-	tl, err := handler.TimelineUsecase.GetTimelineFollowing(userId)
+	limitStr := r.URL.Query().Get("limit")
+	offsetStr := r.URL.Query().Get("offset")
+	
+	limit, err := strconv.Atoi(limitStr)
+	if err != nil {
+		http.Error(w, "INVALID_PARAMETER", http.StatusBadRequest)
+		return
+	}
+
+	offset, err := strconv.Atoi(offsetStr)
+	if err != nil {
+		http.Error(w, "INVALID_PARAMETER", http.StatusBadRequest)
+		return
+	}
+	tl, err := handler.TimelineUsecase.GetTimelineFollowing(userId, limit, offset)
 	if err != nil {
 		http.Error(w, "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
 		return
 	}
 	response := GetTimelineFollowingResponse{
 		Timeline: make([]TimelineTweetResponse, len(tl.Tweets)),
+		Pagination: PaginationResponse{
+			Limit: limit,
+			Offset: offset,
+		},
 	}
 	for i, tweet := range tl.Tweets {
 		response.Timeline[i] = TimelineTweetResponse{
