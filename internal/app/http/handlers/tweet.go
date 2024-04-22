@@ -47,8 +47,7 @@ func (handler TweetHandler) NewTweetHandler(w http.ResponseWriter, r *http.Reque
         return
     }
 
-	// Get the user from the request headers
-	// user := r.Header.Get("x-user-id")
+	// Get the user ID from the request context
 	user := r.Context().Value(auth.UserIDKey)
 	// Perform type assertion to convert to string
 	uniqueIdentifier, err := uuid.Parse(user.(string))
