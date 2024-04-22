@@ -11,6 +11,7 @@ import (
 
 func Middleware(next http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		w.Header().Set("Content-Type", "application/json")
 		userId := r.Header.Get("x-user-id")
 		username := r.Header.Get("x-username")
 		
@@ -20,7 +21,7 @@ func Middleware(next http.Handler) http.Handler {
 				http.Error(w, "INVALID_USER", http.StatusForbidden)
 				return
 			}
-			http.Error(w, "INTERNAL_SERVER_ERROR", http.StatusInternalServerError)
+			http.Error(w, err.Error(), http.StatusInternalServerError)
 			return
 		}
 
@@ -31,6 +32,5 @@ func Middleware(next http.Handler) http.Handler {
 		// Call the next handler with the updated request context
 		next.ServeHTTP(w, r.WithContext(ctx))
 
-		// w.Header().Set("Content-Type", "application/json")
 	})
 }
