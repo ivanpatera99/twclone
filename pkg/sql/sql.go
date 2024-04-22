@@ -8,7 +8,7 @@ import (
 
 var (
 	driverName = "sqlite3"
-	dbPath     = "/Users/ivanpatera/projects/me/twclone/twclone.db"
+	dbPath     = "db.db"
 )
 
 func QueryRow(query string, args ...any) (*sql.Row, error) {
