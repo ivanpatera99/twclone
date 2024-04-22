@@ -1,0 +1,4 @@
+1. Asumo que la logica mockeada dentro del paquete pkg corresponden 
+a desiciones desacopladas del diseño de la app y son paquetes de utilidades que esperaria
+tener en un monorepo como pueden ser: logica de middleware, abstracciones del motor de datos,
+manejo de pools de conexiones a las dbs, autenticacion, etc
