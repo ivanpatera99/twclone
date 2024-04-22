@@ -1,8 +1,6 @@
 package auth
 
 import (
-	"errors"
-
 	"github.com/ivanpatera/twclone/pkg/sql"
 
 	"github.com/google/uuid"
@@ -29,13 +27,13 @@ func GetUser(userId string, username string) (User, error) {
 	err = row.Scan(&user.ID, &user.Username)
 	// if the user does not exist, create a new one with the provided username
 	// additionaly, if username is empty, request fails
-	if err != nil && user.Username != "" {
+	if err != nil && username != "" {
 		id := uuid.New().String()
 		_, err := sql.InsertRow("INSERT INTO users (id, username, follower_count) VALUES (?, ?, 0)", id, username)
 		if err != nil {
 			return User{}, err
 		}
 		return User{ID: id, Username: username}, nil
-	} 
-	return User{}, errors.New("INVALID_USER")
+	}
+	return user, nil
 }
